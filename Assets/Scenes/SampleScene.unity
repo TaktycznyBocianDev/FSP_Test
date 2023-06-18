@@ -1835,27 +1835,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: feeb8730d611c3b4e9cff76d5bb78bf0, type: 3}
   m_PrefabInstance: {fileID: 1072132753}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1998798752
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1998798748}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33681fdefc487374bb4ee94df6ecc7cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 10
-  range: 100
-  fireRate: 15
-  impactForce: 250
-  cam: {fileID: 963194227}
-  animator: {fileID: 1998798755}
-  audioSource: {fileID: 1998798756}
-  shoot: {fileID: 8300000, guid: 2fdcc94b7bb533f4fa2f0c48327a22e8, type: 3}
-  reload: {fileID: 8300000, guid: 26ecaab2efd26fa4a8f7ade945b71fbb, type: 3}
 --- !u!95 &1998798755
 Animator:
   serializedVersion: 4
@@ -1972,6 +1951,30 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1998798757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1998798748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe2cbdefad734b64ca111aee996846f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 10
+  range: 100
+  fireRate: 50
+  impactForce: 60
+  beforeReloadSoundTime: 0.45
+  afterReloadSoundTime: 0.45
+  isAutomatic: 0
+  playerCam: {fileID: 963194227}
+  weaponAnimator: {fileID: 1998798755}
+  weaponAudioSource: {fileID: 1998798756}
+  shootSound: {fileID: 8300000, guid: 2fdcc94b7bb533f4fa2f0c48327a22e8, type: 3}
+  reloadSound: {fileID: 8300000, guid: 26ecaab2efd26fa4a8f7ade945b71fbb, type: 3}
 --- !u!1 &2067994200
 GameObject:
   m_ObjectHideFlags: 0
