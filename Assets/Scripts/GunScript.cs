@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(Animator), typeof(AudioSource))]
 public abstract class GunScript : MonoBehaviour
 {
     //Common Fields
@@ -9,27 +10,49 @@ public abstract class GunScript : MonoBehaviour
     public float range = 100f;
     public float fireRate = 50f;
     public float impactForce = 60f;
-    public float beforeReloadSoundTime = 0.45f;
-    public float afterReloadSoundTime = 0.45f;
+    public float maxAmmo = 1f;
+    public float reloadTime = 0.9f;
     public bool isAutomatic = true;
+    public string animationVariable;
 
     //Common Fields
     [Header("Needed componenets")]
     public Camera playerCam;
-    public Animator weaponAnimator;
-    public AudioSource weaponAudioSource;
     public AudioClip shootSound, reloadSound;
 
-    private float nextTimeToFire = 0f;
-    private bool isShooting = false;
+
+    protected Animator weaponAnimator;
+    protected AudioSource weaponAudioSource;
+    public float nextTimeToFire = 0f;
+    public float currentAmmo = 0f;
+    public bool isReloading = false;
+
+    private void Start()
+    {
+        currentAmmo = maxAmmo;
+    }
+
+    private void Awake()
+    {
+        weaponAnimator = GetComponent<Animator>();
+        weaponAudioSource = GetComponent<AudioSource>();
+    }
 
     protected virtual void Update()
     {
 
-        if (Input.GetButtonDown("Fire1") && !isShooting && !isAutomatic)
+        if (isReloading) return; //stop everything else if PLayer is reloading
+
+        if (currentAmmo <= 0 || Input.GetKeyDown(KeyCode.R)) //Force reload
+        {
+            StartCoroutine(Reload());
+            return;
+        }
+
+        if (Input.GetButtonDown("Fire1") && !isAutomatic)
         {
             nextTimeToFire = Time.time + 1f / fireRate;
-            StartCoroutine(Shoot());
+            Shoot();
             Debug.Log("Shoot!");
             return;
 
@@ -38,7 +61,7 @@ public abstract class GunScript : MonoBehaviour
         if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire && isAutomatic)
         {
             nextTimeToFire = Time.time + 1f / fireRate;
-            StartCoroutine(Shoot());
+            Shoot();
             Debug.Log("Shoot!");
             return;
 
@@ -46,9 +69,30 @@ public abstract class GunScript : MonoBehaviour
 
     }
 
-    IEnumerator Shoot()
+    protected virtual IEnumerator Reload()
     {
-        isShooting = true;
+        isReloading = true;
+
+        weaponAnimator.SetBool(animationVariable, true);
+
+
+
+        weaponAudioSource.clip = reloadSound;
+        weaponAudioSource.Play();
+
+
+        yield return new WaitForSeconds(reloadTime);
+
+        weaponAnimator.SetBool(animationVariable, false);
+
+        currentAmmo = maxAmmo;
+
+        isReloading = false;
+    }
+
+    protected virtual void Shoot()
+    {
+
         weaponAudioSource.clip = shootSound;
         weaponAudioSource.Play();
 
@@ -56,7 +100,7 @@ public abstract class GunScript : MonoBehaviour
 
         if (Physics.Raycast(playerCam.transform.position, playerCam.transform.forward, out hit, range))
         {
-            //Debug.Log(hit.transform.name);
+            Debug.Log(hit.transform.name);
             Target target = hit.transform.GetComponent<Target>();
             if (target != null)
             {
@@ -69,18 +113,45 @@ public abstract class GunScript : MonoBehaviour
             hit.rigidbody.AddForce(-hit.normal * impactForce);
         }
 
-        weaponAnimator.SetBool("ShootShotgun", true);
-
-        yield return new WaitForSeconds(beforeReloadSoundTime); 
-
-        weaponAudioSource.clip = reloadSound;
-        weaponAudioSource.Play();
-
-        yield return new WaitForSeconds(afterReloadSoundTime);
-        weaponAnimator.SetBool("ShootShotgun", false);
-        isShooting = false;
+        currentAmmo--;
 
     }
+
+    //protected virtual IEnumerator Shoot()
+    //{
+
+    //    weaponAudioSource.clip = shootSound;
+    //    weaponAudioSource.Play();
+
+    //    RaycastHit hit;
+
+    //    if (Physics.Raycast(playerCam.transform.position, playerCam.transform.forward, out hit, range))
+    //    {
+    //        //Debug.Log(hit.transform.name);
+    //        Target target = hit.transform.GetComponent<Target>();
+    //        if (target != null)
+    //        {
+    //            target.TakeDamage(damage);
+    //        }
+    //    }
+
+    //    if (hit.rigidbody != null)
+    //    {
+    //        hit.rigidbody.AddForce(-hit.normal * impactForce);
+    //    }
+
+    //    weaponAnimator.SetBool("ShootShotgun", true);
+
+    //    yield return new WaitForSeconds(reloadTime); 
+
+    //    weaponAudioSource.clip = reloadSound;
+    //    weaponAudioSource.Play();
+
+    //    yield return new WaitForSeconds(reloadTime);
+    //    weaponAnimator.SetBool("ShootShotgun", false);
+
+
+    //}
 
 
 }
