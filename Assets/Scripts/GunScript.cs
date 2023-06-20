@@ -15,7 +15,6 @@ public abstract class GunScript : MonoBehaviour
     public bool isAutomatic = true;
     public string animationVariable;
 
-    //Common Fields
     [Header("Needed componenets")]
     public Camera playerCam;
     public AudioClip shootSound, reloadSound;
@@ -23,9 +22,9 @@ public abstract class GunScript : MonoBehaviour
 
     protected Animator weaponAnimator;
     protected AudioSource weaponAudioSource;
-    public float nextTimeToFire = 0f;
-    public float currentAmmo = 0f;
-    public bool isReloading = false;
+    protected float nextTimeToFire = 0f;
+    protected float currentAmmo = 0f;
+    protected bool isReloading = false;
 
     private void Start()
     {
@@ -36,6 +35,7 @@ public abstract class GunScript : MonoBehaviour
     {
         weaponAnimator = GetComponent<Animator>();
         weaponAudioSource = GetComponent<AudioSource>();
+        weaponAudioSource.Stop();
     }
 
     protected virtual void Update()
@@ -43,27 +43,19 @@ public abstract class GunScript : MonoBehaviour
 
         if (isReloading) return; //stop everything else if PLayer is reloading
 
-        if (currentAmmo <= 0 || Input.GetKeyDown(KeyCode.R)) //Force reload
+        if (currentAmmo <= 0 || (Input.GetKeyDown(KeyCode.R) && currentAmmo != maxAmmo))
         {
             StartCoroutine(Reload());
             return;
         }
 
-        if (Input.GetButtonDown("Fire1") && !isAutomatic)
+        //If is automatic, then get button down OR get only button but then take time into account
+        if ((Input.GetButtonDown("Fire1") && !isAutomatic) ||
+            (Input.GetButton("Fire1") && Time.time >= nextTimeToFire && isAutomatic))
         {
             nextTimeToFire = Time.time + 1f / fireRate;
             Shoot();
             Debug.Log("Shoot!");
-            return;
-
-        }
-
-        if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire && isAutomatic)
-        {
-            nextTimeToFire = Time.time + 1f / fireRate;
-            Shoot();
-            Debug.Log("Shoot!");
-            return;
 
         }
 
@@ -93,8 +85,8 @@ public abstract class GunScript : MonoBehaviour
     protected virtual void Shoot()
     {
 
-        weaponAudioSource.clip = shootSound;
-        weaponAudioSource.Play();
+        //weaponAudioSource.clip = shootSound;
+        weaponAudioSource.PlayOneShot(shootSound);
 
         RaycastHit hit;
 
@@ -116,42 +108,4 @@ public abstract class GunScript : MonoBehaviour
         currentAmmo--;
 
     }
-
-    //protected virtual IEnumerator Shoot()
-    //{
-
-    //    weaponAudioSource.clip = shootSound;
-    //    weaponAudioSource.Play();
-
-    //    RaycastHit hit;
-
-    //    if (Physics.Raycast(playerCam.transform.position, playerCam.transform.forward, out hit, range))
-    //    {
-    //        //Debug.Log(hit.transform.name);
-    //        Target target = hit.transform.GetComponent<Target>();
-    //        if (target != null)
-    //        {
-    //            target.TakeDamage(damage);
-    //        }
-    //    }
-
-    //    if (hit.rigidbody != null)
-    //    {
-    //        hit.rigidbody.AddForce(-hit.normal * impactForce);
-    //    }
-
-    //    weaponAnimator.SetBool("ShootShotgun", true);
-
-    //    yield return new WaitForSeconds(reloadTime); 
-
-    //    weaponAudioSource.clip = reloadSound;
-    //    weaponAudioSource.Play();
-
-    //    yield return new WaitForSeconds(reloadTime);
-    //    weaponAnimator.SetBool("ShootShotgun", false);
-
-
-    //}
-
-
 }
