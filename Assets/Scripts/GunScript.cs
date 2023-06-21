@@ -38,6 +38,12 @@ public abstract class GunScript : MonoBehaviour
         weaponAudioSource.Stop();
     }
 
+    private void OnEnable()
+    {
+        isReloading = false;
+        weaponAnimator.SetBool(animationVariable, false);
+    }
+
     protected virtual void Update()
     {
 
@@ -93,7 +99,7 @@ public abstract class GunScript : MonoBehaviour
         if (Physics.Raycast(playerCam.transform.position, playerCam.transform.forward, out hit, range))
         {
             Debug.Log(hit.transform.name);
-            Target target = hit.transform.GetComponent<Target>();
+            EnemyBehaviour target = hit.transform.GetComponent<EnemyBehaviour>();
             if (target != null)
             {
                 target.TakeDamage(damage);
