@@ -61,7 +61,7 @@ public abstract class GunScript : MonoBehaviour
         {
             nextTimeToFire = Time.time + 1f / fireRate;
             Shoot();
-            Debug.Log("Shoot!");
+            //Debug.Log("Shoot!");
 
         }
 
@@ -98,18 +98,15 @@ public abstract class GunScript : MonoBehaviour
 
         if (Physics.Raycast(playerCam.transform.position, playerCam.transform.forward, out hit, range))
         {
-            Debug.Log(hit.transform.name);
+            //Debug.Log(hit.transform.name);
             EnemyBehaviour target = hit.transform.GetComponent<EnemyBehaviour>();
             if (target != null)
             {
-                target.TakeDamage(damage);
+                target.TakeDamage(damage, impactForce, hit);
             }
         }
 
-        if (hit.rigidbody != null)
-        {
-            hit.rigidbody.AddForce(-hit.normal * impactForce);
-        }
+       
 
         currentAmmo--;
 
